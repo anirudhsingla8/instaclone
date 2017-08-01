@@ -52,6 +52,3 @@ class CommentModel(BaseModel):
     comment_text = models.CharField(max_length=555)
 
 
-class CategoryModel(models.Model):
-    post = models.ForeignKey(PostModel)
-    category_text = models.CharField(max_length=555)
