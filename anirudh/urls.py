@@ -20,9 +20,11 @@ from app.views import signup_view, login_view, feed_view, post_view, like_view, 
 urlpatterns = [
     url(r'^/feed', feed_view),
     url('post', post_view),
-    url('', signup_view),
-    url('login', login_view),
+    
+    
     url('like', like_view),
     url('comment', comment_view),
     url('admin', admin.site.urls),
+    url(r'^login', login_view), 
+    url('', signup_view),
 ]
