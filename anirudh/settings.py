@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'clone.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sachit',
+        'NAME': 'anirudh',
         'USER':'root',
         'PASSWORD':'root',
         'HOST':'127.0.0.1',
