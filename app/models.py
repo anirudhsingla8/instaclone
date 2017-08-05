@@ -1,31 +1,37 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django.db import models
+
 import uuid
-from custom_addons.models import BaseModel
-from anirudh.settings import BASE_DIR
 
 # Create your models here.
-class UserModel(BaseModel):
-    email = models.EmailField(max_length=100,unique=True,blank=False)
+
+class UserModel(models.Model):
+    email = models.EmailField()
     name = models.CharField(max_length=120)
-    username = models.CharField(max_length=120, blank=False)
-    password = models.CharField(max_length=255)
+    username = models.CharField(max_length=200)
+    password = models.CharField(max_length=200)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
-
-class UserSession(BaseModel):
-    user = models.ForeignKey(UserModel, on_delete=models.PROTECT)
+class SessionToken(models.Model):
+    user = models.ForeignKey(UserModel)
     session_token = models.CharField(max_length=255)
+    last_request_on = models.DateTimeField(auto_now=True)
+    created_on = models.DateTimeField(auto_now_add=True)
     is_valid = models.BooleanField(default=True)
 
-    def create_session_token(self):
+    def create_token(self):
         self.session_token = uuid.uuid4()
 
-
-class PostModel(BaseModel):
+class PostModel(models.Model):
     user = models.ForeignKey(UserModel)
     image = models.FileField(upload_to='user_images')
     image_url = models.CharField(max_length=255)
     caption = models.CharField(max_length=240)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     has_liked = False
 
 
@@ -34,21 +40,22 @@ class PostModel(BaseModel):
         return len(LikeModel.objects.filter(post=self))
 
     @property
-    def comment(self):
+    def comments(self):
         return CommentModel.objects.filter(post=self).order_by('-created_on')
 
-    @property
-    def categories(self):
-        return CategoryModel.objects.filter(post=self)
 
-class LikeModel(BaseModel):
+
+class LikeModel(models.Model):
     user = models.ForeignKey(UserModel)
     post = models.ForeignKey(PostModel)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
 
-class CommentModel(BaseModel):
+class CommentModel(models.Model):
     user = models.ForeignKey(UserModel)
     post = models.ForeignKey(PostModel)
     comment_text = models.CharField(max_length=555)
-
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 

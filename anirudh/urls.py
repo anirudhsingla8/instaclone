@@ -1,4 +1,4 @@
-"""anirudh URL Configuration
+"""clone URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -15,16 +15,19 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from app.views import signup_view, login_view, feed_view, post_view, like_view, comment_view
+
+from cloneapp.views import signup_view, login_view, post_view, feed_view, like_view, comment_view
 
 urlpatterns = [
-    url(r'^/feed', feed_view),
-    url('post', post_view),
-    
-    
     url('like', like_view),
     url('comment', comment_view),
-    url('admin', admin.site.urls),
-    url(r'^login', login_view), 
+
+    url('feed', feed_view),
+    url('post', post_view),
+
+
+
+    url(r'^admin/', admin.site.urls),
+    url('login', login_view),
     url('', signup_view),
 ]

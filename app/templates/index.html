@@ -11,13 +11,13 @@
             <h1> Instagram Clone</h1>
             <h3>Sign Up</h3>
     </div>
-    {{ today1 }}belongs to Anirudh Singla
+
     <div>
         <form method="post">
-        {% csrf_token %}
+            {% csrf_token %}
             <div>
                 <label for="username">Username: </label>
-                <input id="username" type="text" name="username" value = {{username}} >
+                <input id="username" type="text" name="username" value={{ username }}>
             </div>
 
             <div>
@@ -40,6 +40,6 @@
 
     </div><br><br>
 
-    <div><h3>Already a user?</h3><a href="/login">Login</a> </div>
+    <div><h3>Already a user?</h3><a href="login/">Login</a> </div>
 </body>
 </html>
