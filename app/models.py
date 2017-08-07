@@ -10,8 +10,8 @@ import uuid
 class UserModel(models.Model):
     email = models.EmailField()
     name = models.CharField(max_length=120)
-    username = models.CharField(max_length=200)
-    password = models.CharField(max_length=200)
+    username = models.CharField(max_length=120)
+    password = models.CharField(max_length=40)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -44,7 +44,6 @@ class PostModel(models.Model):
         return CommentModel.objects.filter(post=self).order_by('-created_on')
 
 
-
 class LikeModel(models.Model):
     user = models.ForeignKey(UserModel)
     post = models.ForeignKey(PostModel)
@@ -59,3 +58,7 @@ class CommentModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
+
+class Category(models.Model):
+    post = models.ForeignKey(PostModel)
+    category_type = models.CharField(max_length=555)

@@ -3,17 +3,21 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
-
-from clone.settings import BASE_DIR
+import datetime
+from anirudh.settings import BASE_DIR
 from imgurpython import ImgurClient
 
 from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel
 from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm
+import sendgrid
+from sendgrid.helpers.mail import *
+from clarifai.rest import ClarifaiApp
 
 
+clari = 'fb62f6d1e3c7455fa3f6167604bece61'
 YOUR_CLIENT_ID = "061fbca36570a61"
 YOUR_CLIENT_SECRET = "7d9841c62e75b77a4592391463c09747496e0cd7"
-
+API_KEY = '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'
 
 def signup_view(request):
     if request.method == "POST":
@@ -25,11 +29,20 @@ def signup_view(request):
             password = form.cleaned_data['password']
             user = UserModel(name=name, password=make_password(password), email=email, username=username)
             user.save()
+
+            sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+            from_email = Email("support@InstaClone.com")
+            to_email = Email(email)
+            subject = "Signup Succesfull!"
+            content = Content("text/plain","Welcome to InstaClone.Login and enjoy!")
+            mail = Mail(from_email, subject, to_email, content)
+            response = sg.client.mail.send.post(request_body=mail.get())
+
             return render(request, 'success.html')
     else:
         form = SignUpForm()
-
-    return render(request, 'index.html', {'form':form})
+    today=datetime.now()
+    return render(request, 'index.html',{'today':today}, {'form':form})
 
 
 def login_view(request):
@@ -58,6 +71,7 @@ def login_view(request):
     response_data['form'] = form
     return render(request, 'login.html', response_data)
 
+
 def post_view(request):
     user = check_validation(request)
 
@@ -75,7 +89,6 @@ def post_view(request):
                 client = ImgurClient(YOUR_CLIENT_ID, YOUR_CLIENT_SECRET)
                 post.image_url = client.upload_from_path(path,anon=True)['link']
                 post.save()
-
 
 
                 return redirect('/feed/')
@@ -129,6 +142,20 @@ def comment_view(request):
             comment_text = form.cleaned_data.get('comment_text')
             comment = CommentModel.objects.create(user=user, post_id=post_id, comment_text=comment_text)
             comment.save()
+
+            posting = PostModel.objects.filter(id=post_id).first()
+            userid = posting.user_id
+            user = UserModel.objects.filter(id=userid).first()
+            mail = user.email
+
+            sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+            from_email = Email("support@InstaClone.com")
+            to_email = Email(mail)
+            subject = "Comment Notification"
+            content = Content("text/plain", "Someone just commented on your post!")
+            mail = Mail(from_email, subject, to_email, content)
+            response = sg.client.mail.send.post(request_body=mail.get())
+
             return redirect('/feed/')
         else:
             return redirect('/feed/')
@@ -142,4 +169,26 @@ def check_validation(request):
             return session.user
     else:
         return None
+
+def category(post):
+    app = ClarifaiApp(api_key=clari)
+    model = app.models.get("general-v1.3")
+    response = model.predict_by_url(url=post.image_url)
+    if response["status"]["code"] == 10000:
+        if response["outputs"]:
+            if response["outputs"][0]["data"]:
+                if response["outputs"][0]["data"]["concepts"]:
+                    for index in range(0, len(response["outputs"][0]["data"]["concepts"])):
+                        category = Category(post=post,category_text=response["outputs"][0]["data"]["concepts"][index]["name"])
+                        category.save()
+                else:
+                    print "No Concepts List found"
+            else:
+                print "No Data found"
+        else:
+            print "No Outputs List found"
+    else:
+        print "Response Code not found"
+
+
 
