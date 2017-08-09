@@ -170,6 +170,15 @@ def check_validation(request):
     else:
         return None
 
+    
+def Logout_view(request):
+    user=check_validation(request)
+    if user:
+        latest_token=SessionToken.objects.filter(user=user).last()
+        if latest_token:
+            latest_token.delete()
+    return redirect('/login/')            
+
 def category(post):
     app = ClarifaiApp(api_key=clari)
     model = app.models.get("general-v1.3")
