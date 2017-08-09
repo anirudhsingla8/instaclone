@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 
 from cloneapp.views import signup_view, login_view, post_view, feed_view, like_view, comment_view
-
+# these are the urls defined
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('logout',logout_view),
