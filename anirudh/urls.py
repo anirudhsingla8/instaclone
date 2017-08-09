@@ -20,6 +20,7 @@ from cloneapp.views import signup_view, login_view, post_view, feed_view, like_v
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url('logout',logout_view),
     url('feed', feed_view),
     url('post', post_view),
 
